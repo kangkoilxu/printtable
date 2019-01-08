@@ -6,8 +6,8 @@
 	* support single line table
 
 #example :
-`
-    mt = Table.Table()
+
+    `mt = Table.Table()
     mt.set_fontcolor(97)
     mt.set_bordercolor(92)
     mt.set_align("center")
@@ -19,8 +19,8 @@
 
 
 > output:
-`
-+------------+----------+-------+--------------+------------+
+
+`+------------+----------+-------+--------------+------------+
 |    name    |  gender  |  age  |   birthday   |   nation   |
 +------------+----------+-------+--------------+------------+
 |  opmdmlwk  |   male   |  32   |  1090-23-90  |   dhand    |

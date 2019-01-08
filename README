@@ -1,1 +1,6 @@
-Python class for print tables
+##Python class for print tables
+
+
+#Features:
+	* support center and left alignments
+	* support single line table

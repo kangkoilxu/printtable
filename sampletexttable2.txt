@@ -1,0 +1,18 @@
+#no_title
+Number of ports:                          491
+Number of nets:                          1989
+Number of cells:                         1505
+Number of combinational cells:           1353
+Number of sequential cells:               152
+Number of macros/black boxes:               0
+Number of buf/inv:                        180
+Number of references:                     125
+
+Combinational area:                148.667400
+Buf/Inv area:                        9.275040
+Noncombinational area:              53.044200
+Macro/Black Box area:                0.000000
+Net Interconnect area:      undefined  (Wire load has zero net area)
+
+Total cell area:                   201.711600
+Total area:                 undefined

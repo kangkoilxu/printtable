@@ -18,7 +18,7 @@
 # | opmdmlwk | male   | 32  | 1090-23-90 | dhand    |
 # | oueiwjg  | female | 83  | 3o83-20-81 | 11222222 |
 # +----------+--------+-----+------------+----------+
-import sys
+import sys,string
 
 class Table:
     def __init__(self):
@@ -31,30 +31,60 @@ class Table:
         self.lenlist= []
         self.bcolor = "\033[92m{0}\033[0m"
         self.fcolor = "\033[93m{0}\033[0m"
+        self.config_color_char()
 
+    def config_color_char(self,l="|",r="|",u="-",d="-",c="+",s=" ",n="\n"):
+        self.lborder = self.bcolor.format(l)
+        self.rborder = self.bcolor.format(r)
+        self.uborder = self.bcolor.format(u)
+        self.dborder = self.bcolor.format(d)
+        self.cornerchar = self.bcolor.format(c)
+        self.wspace = s
+        self.nline = n
 
     def p_list(self):
-        print self.hlist
-        print self.list
-        print self.lenlist
+        print "Header:",self.hlist
+        print "Rows:",self.list
+        print "Length:",self.lenlist
 
     def set_bordercolor(self,ft):
         self.bcolor = "\033[" + str(ft) + "m{0}\033[0m"
+        self.config_color_char()
 
     def set_fontcolor(self,ft):
         self.fcolor = "\033[" + str(ft) + "m{0}\033[0m"
+        self.config_color_char()
 
     def set_align(self,al):
-        if al not in ["center","left","rught"]:
+        if al not in ["center","left"]:
             print "\033[91mError: invalid alignment input\033[0m"
             sys.exit()
         self.align = al
 
+    def wrap_text(self,txt):
+        lenlist = []
+        maxlen = 0
+        if not len(txt):
+            return
+        for line in txt.split("\n"):
+            lenlist.append(len(line))
+        maxlen = max(lenlist)
+
+        border_str = ""
+        border_str += self.cornerchar + self.uborder*(maxlen+2) + self.cornerchar+self.nline
+        for line in txt.split("\n"):
+            if line.strip() == "":
+                continue
+            border_str += self.lborder + self.wspace + str(line.strip("\n")) + self.wspace*( maxlen - len(line) + 1) + self.rborder+self.nline
+        border_str += self.cornerchar + self.uborder*(maxlen+2) + self.cornerchar + self.nline
+        print border_str
+
+    #TODO : string split issue ; use " "  will fail
     def remove_whitespace_sccharacter(self,slist): # remove whitespace and string control characters
         templist = []
         for item in slist:
             if item not in [ " ",""] :
-                templist.append(item.strip().strip("\n"))
+                templist.append(item.strip().strip("\n").strip("\t"))
         return templist
 
     def add_fromtext(self,txt,spstr=" "):
@@ -73,7 +103,7 @@ class Table:
                 aitems = self.remove_whitespace_sccharacter(items)
                 # print len(aitems),aitems
                 if not notitle:
-                    if not linecnt: #if it is first line in the file, It should be the heaser
+                    if not linecnt: #if it is the first line of the file, It should be the header
                         self.addheader(aitems)
                     else:
                         self.addrow(aitems)
@@ -109,17 +139,16 @@ class Table:
         if not len(inlist):
             return
         for tlist in inlist:
-            self.body += self.bcolor.format("\n|")
+            self.body +=  self.nline + self.lborder
             for index,item in enumerate(tlist):
                 if self.align == "center": # space + (half leng space ) + item + (halflen space)
                     odd = (self.lenlist[index] - len(item) ) % 2
                     halflen =  (self.lenlist[index] - len(item))/2 + 2#
-                    self.body += self.fcolor.format( " "* halflen +  str(item) + " "*(halflen+odd) )+ self.bcolor.format("|") #if the length of item is odd, add one space to right of item to balance len
+                    self.body +=  self.wspace* halflen +  self.fcolor.format(str(item)) + self.wspace*(halflen+odd) + self.rborder #if the length of item is odd, add one space to right of item to balance len
                 elif self.align == "left": #two spaces around the item
-                    self.body += self.fcolor.format( " " + str(item) + " "*(self.lenlist[index] - len(item)) ) + self.bcolor.format(" |")
-
+                    self.body += self.wspace + self.fcolor.format(str(item)) + self.wspace*(self.lenlist[index] - len(item))  + self.wspace + self.rborder #self.bcolor.format(" |")
             if is_header:
-                self.body += "\n"+self.bcolor.format(self.header)
+                self.body += self.nline + self.bcolor.format(self.header)
 
     def printtable(self,border=0):
         self.lenlist = [] #var to store the max length of item
@@ -152,13 +181,13 @@ class Table:
             print "\033[91mError : invalid input\033[0m",e
             sys.exit()
         #prepare header and tail string
-        self.header += "+"
+        self.header += self.cornerchar
         for item in self.lenlist:
             if self.align == "center":
-                self.header += "-"*(item + 4) + "+"
+                self.header += self.uborder*(item + 4) +self.cornerchar
             else :
-                self.header += "-"*(item + 2)+"+"
-        self.tail = "\n" + self.header
+                self.header += self.dborder*(item + 2)+self.cornerchar
+        self.tail = self.nline + self.header
 
         #handle header
         if len(self.hlist):
